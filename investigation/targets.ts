@@ -1,0 +1,35 @@
+/** Public, logged-out reference pages for each catalogued activity (from GAME_CATALOG.md). */
+export const ORIGIN = 'https://www.tradermath.org';
+export const TARGETS: { id: string; path: string }[] = [
+  { id: 'dice', path: '/market-games/market-making-dice-game/settings' },
+  { id: 'trading-game', path: '/market-games/trading-game/lobby' },
+  { id: 'etf-arb', path: '/market-games/etf-arbitrage-game/settings' },
+  { id: 'card-game', path: '/market-games/market-taking-game/lobby' },
+  { id: 'fermi-game', path: '/market-games/fermi-estimation-game/settings' },
+  { id: 'event-contracts', path: '/market-games/event-contracts-game/settings' },
+  { id: 'higher-lower', path: '/market-games/higher-or-lower-game/settings' },
+  { id: 'math', path: '/tradermath-math-trainer/dashboard' },
+  { id: 'sequence', path: '/tradermath-sequence-trainer/dashboard' },
+  { id: 'fractions', path: '/fractions-to-decimals/dashboard' },
+  { id: 'probability', path: '/tradermath-probability-trainer/dashboard' },
+  { id: 'fermi-questions', path: '/fermi-questions' },
+  { id: 'etf-drills', path: '/trainers/etf-strategy/dashboard' },
+  { id: 'options-drills', path: '/trainers/options-strategy/dashboard' },
+  { id: 'futures-drills', path: '/trainers/futures-basis/dashboard' },
+  { id: 'prediction-drills', path: '/trainers/prediction-markets/dashboard' },
+  { id: 'task-switch', path: '/task-switch/dashboard' },
+  { id: 'response-conflict', path: '/response-conflict/dashboard' },
+  { id: 'pincode', path: '/pincode-game/dashboard' },
+  { id: 'cube-folding', path: '/cube-folding' },
+  { id: 'code-match', path: '/code-match/dashboard' },
+  { id: 'grid-recall', path: '/grid-recall/dashboard' },
+  { id: 'intercept', path: '/intercept/dashboard' },
+  { id: 'hold-fire', path: '/hold-fire/dashboard' },
+  { id: 'target-number', path: '/target-number/dashboard' },
+  { id: 'pump', path: '/pump/dashboard' },
+  { id: 'skyline', path: '/skyline/dashboard' },
+  { id: 'mystery-figure', path: '/mystery-figure/dashboard' },
+  { id: 'sweet-spot', path: '/sweet-spot/dashboard' },
+];
+/** Delay between page loads. Keep this polite. */
+export const POLITE_DELAY_MS = 4000;

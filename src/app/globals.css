@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Palette as RGB channels so Tailwind opacity modifiers work. */
+:root {
+  --paper: 238 241 244;   /* #EEF1F4 cool blotter grey */
+  --surface: 255 255 255;
+  --ink: 24 33 43;        /* #18212B */
+  --muted: 91 103 117;    /* #5B6775 */
+  --line: 213 219 226;    /* #D5DBE2 */
+  --accent: 36 87 214;    /* #2457D6 cobalt */
+  --bid: 15 138 95;       /* #0F8A5F */
+  --ask: 194 65 45;       /* #C2412D */
+  color-scheme: light;
+}
+.dark {
+  --paper: 18 26 35;      /* #121A23 */
+  --surface: 26 36 48;    /* #1A2430 */
+  --ink: 230 235 240;
+  --muted: 147 160 174;
+  --line: 42 54 68;
+  --accent: 110 149 245;
+  --bid: 52 185 138;
+  --ask: 238 122 98;
+  color-scheme: dark;
+}
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-paper text-ink antialiased; font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; }
+.num { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }

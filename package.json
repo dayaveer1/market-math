@@ -1,0 +1,49 @@
+{
+  "name": "floorwork",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Free, open-source practice platform for quantitative trading interviews. Static site: runs entirely in the browser.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "node scripts/check-static.mjs && node scripts/build-static.mjs",
+    "start": "node scripts/serve-out.mjs --base \"\"",
+    "preview": "node scripts/build-static.mjs --base /floorwork && node scripts/serve-out.mjs --base /floorwork",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "check:static": "node scripts/check-static.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:static": "node scripts/build-static.mjs --base /floorwork --e2e && playwright test --config playwright.static.config.ts",
+    "test:all": "npm run typecheck && npm run test && npm run build && npm run test:static",
+    "harness": "node tools/harness/build.mjs && node tools/harness/out/ssr.cjs && node tools/harness/drive-games.cjs && node tools/harness/drive-app.cjs",
+    "screenshots": "node scripts/screenshots.mjs",
+    "investigate": "playwright test --config playwright.investigate.config.ts"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans": "^5.0.20",
+    "next": "^14.2.25",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.25",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.2",
+    "esbuild": "^0.23.0"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "license": "MIT"
+}

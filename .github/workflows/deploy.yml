@@ -1,0 +1,69 @@
+# Builds Floorwork as a static site and publishes it to GitHub Pages on every push to main.
+# One-time setup: repository Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allows a manual run from the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; let an in-progress deployment finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Static export check
+        run: npm run check:static
+
+      - name: Build static site
+        # base_path is "/<repo-name>" for project sites and "" for a USERNAME.github.io repository.
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: node scripts/build-static.mjs
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
