@@ -1,10 +1,12 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * E2E against the STATIC EXPORT served like GitHub Pages under /floorwork/.
- * Build first with the test hook: `node scripts/build-static.mjs --base /floorwork --e2e` (npm run test:static does both).
+ * E2E against the STATIC EXPORT, served the way GitHub Pages serves it, under the base path from site.config.json
+ * (e.g. /market-math/). Build first with the test hook: `npm run test:static` does both steps.
  */
-process.env.E2E_BASE_PATH ??= '/floorwork';
+const base = (JSON.parse(readFileSync('site.config.json', 'utf8')).basePath ?? '').replace(/\/$/, '');
+process.env.E2E_BASE_PATH ??= base;
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 60_000,
@@ -15,5 +17,5 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
-  webServer: { command: 'node scripts/serve-out.mjs --base /floorwork --port 4173', url: 'http://localhost:4173/floorwork/', reuseExistingServer: !process.env.CI, timeout: 30_000 },
+  webServer: { command: 'node scripts/serve-out.mjs --port 4173', url: `http://localhost:4173${base}/`, reuseExistingServer: !process.env.CI, timeout: 30_000 },
 });

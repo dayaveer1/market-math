@@ -1,14 +1,15 @@
 // Serves `out/` the way GitHub Pages does, under a base path, for previews and static e2e tests.
-// Usage: node scripts/serve-out.mjs [--base /floorwork] [--port 4173]
+// Usage: node scripts/serve-out.mjs [--base /market-math] [--port 4173]   (base defaults to site.config.json)
 //  - /base/dir  → 301 to /base/dir/ (query kept)      - /base/dir/ → dir/index.html
 //  - missing    → 404.html with status 404              - anything outside /base → 404
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 import { resolveRequest } from './pages-resolve.mjs';
+import { resolveBase } from './site.mjs';
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
-const base = (opt('--base', process.env.NEXT_PUBLIC_BASE_PATH ?? '/floorwork') || '').replace(/\/$/, '');
+const base = resolveBase(args);
 const port = Number(opt('--port', process.env.PORT ?? 4173));
 const root = opt('--dir', 'out');
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.woff': 'font/woff', '.txt': 'text/plain; charset=utf-8' };

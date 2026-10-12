@@ -9,7 +9,7 @@ Read `PROGRESS.md` first and continue from its first unchecked item. Update it, 
 - Mathematics lives in pure functions under `src/lib/engines/` with Vitest tests. Components only render and route input.
 
 ## Commands
-`npm run dev` · `npm test` · `npm run typecheck` · `npm run check:static` · `npm run build` (static export + verify) · `npm run preview` (served like GitHub Pages at /floorwork/) · `npm run test:e2e` · `npm run test:static` · `npm run harness` · `npm run investigate`
+`npm run dev` · `npm test` · `npm run typecheck` · `npm run check:static` · `npm run build` (static export + verify) · `npm run preview` (served like GitHub Pages at /market-math/, from site.config.json) · `npm run test:e2e` · `npm run test:static` · `npm run harness` · `npm run investigate`
 
 ## Static hosting rules (GitHub Pages)
 - No server code: no route handlers, server actions, `next/headers`, middleware, `dynamic`/`revalidate` exports or `next/image`. `npm run check:static` enforces this.

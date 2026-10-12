@@ -1,5 +1,5 @@
-# Optional browser tests of the static export (all 51 activities, desktop + mobile).
-# Run manually from the Actions tab; it does not block deployment.
+# Optional browser tests of the static export (all 51 activities, desktop + mobile), served under the
+# base path in site.config.json exactly as GitHub Pages serves it. Run manually; it does not block deployment.
 name: Browser tests (static export)
 
 on:
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
@@ -26,7 +26,7 @@ jobs:
         run: npm run test:static
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: playwright-report

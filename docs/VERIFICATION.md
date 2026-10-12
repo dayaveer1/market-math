@@ -48,7 +48,19 @@ What has actually been executed, where, and with what result. Nothing here shoul
 - Base path applied to every asset, link and client-side navigation in the real export
 - Direct loads and refreshes of every page on GitHub Pages; the 404 page; navigation with the base path (covered by `tests/e2e/static.spec.ts`, not yet run)
 - Persistence across refresh, the daily challenge using the visitor's date, desktop and mobile layout without horizontal scroll (also in `static.spec.ts`)
-- The deployed site at `https://USERNAME.github.io/floorwork/`
+- The deployed site at `https://dayaveer1.github.io/market-math/`
+
+## 1c. First GitHub Actions run and workflow fix (session 5)
+
+**Observed on GitHub** (run on commit ac8f329, dayaveer1/market-math): build job failed after ~12 s in `actions/configure-pages@v5` with `HttpError: Not Found … Get Pages site failed`. Deploy was skipped. No dependency install, type-check, test or build ran. Annotations also warned that Node 20 actions are deprecated.
+
+**Diagnosis:** the Pages site did not exist when the run executed. The run was triggered by the upload commit; GitHub's Pages API returns 404 until Source is set to GitHub Actions. `enablement: true` is not a fix with the built-in `GITHUB_TOKEN`: per the action's documentation it needs a PAT or App token with Pages/administration write, otherwise it fails with "Resource not accessible by integration".
+
+**Changes:** build job no longer calls the Pages API (base path derived from the repository name, overridable by the `PAGES_BASE_PATH` variable); deploy job checks Pages with `gh api` and fails with an actionable message; optional PAT-gated `configure-pages` with `enablement: true`; per-job least-privilege permissions; actions upgraded to Node-24 majors (checkout v6, setup-node v6, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v6); Node 22 for the build; `site.config.json` drives local preview/tests (`/market-math`).
+
+**Checked in the sandbox:** both workflows parse as YAML with the intended jobs, permissions and actions; the base-path step was executed with bash for `dayaveer1/market-math` → `/market-math`, `dayaveer1/dayaveer1.github.io` → root, override `/` → root, mixed-case repo names; the Pages preflight script was executed against a fake `gh` in three states (not enabled → actionable error, exit 1; branch source → error, exit 1; GitHub Actions source → pass); `resolveBase` 6/6 cases; `verify-export` and the preview server with the `/market-math` default (old `/floorwork/` path → 404); static check passed.
+
+**Not verified:** the workflow on GitHub (actions run only there; `actionlint` was unavailable offline); everything after "Install dependencies" (real install, type-check, Vitest, `next build`), and the deployment. Nothing is claimed deployed until GitHub Actions shows both jobs green.
 
 ## 2. Mathematical checks covered by unit tests
 Session-3 audit (`tests/unit/audit.test.ts`): for every question generator and family × level, multiple choice accepts exactly one option and the displayed answer is accepted when typed; for all 51 activities, documentation exists, Easy ≠ Hard presets, battery section settings stay inside every setting's bounds at 1/5/30-minute sections, and normalised scores stay within 0–100; Cube Folding yields the requested 3–6 options with exactly one true; Bet Grid works for every revealed/bets combination.

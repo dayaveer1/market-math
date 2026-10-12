@@ -6,15 +6,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "node scripts/check-static.mjs && node scripts/build-static.mjs",
-    "start": "node scripts/serve-out.mjs --base \"\"",
-    "preview": "node scripts/build-static.mjs --base /floorwork && node scripts/serve-out.mjs --base /floorwork",
+    "start": "node scripts/serve-out.mjs",
+    "preview": "node scripts/build-static.mjs && node scripts/serve-out.mjs",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "check:static": "node scripts/check-static.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:static": "node scripts/build-static.mjs --base /floorwork --e2e && playwright test --config playwright.static.config.ts",
+    "test:static": "node scripts/build-static.mjs --e2e && playwright test --config playwright.static.config.ts",
     "test:all": "npm run typecheck && npm run test && npm run build && npm run test:static",
     "harness": "node tools/harness/build.mjs && node tools/harness/out/ssr.cjs && node tools/harness/drive-games.cjs && node tools/harness/drive-app.cjs",
     "screenshots": "node scripts/screenshots.mjs",
@@ -45,5 +45,10 @@
   "engines": {
     "node": ">=18.18"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://dayaveer1.github.io/market-math/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dayaveer1/market-math.git"
+  }
 }

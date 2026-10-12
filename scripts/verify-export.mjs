@@ -1,8 +1,9 @@
 // Checks the exported `out/` folder: every route has an index.html, asset URLs carry the base path, Pages files exist.
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { resolveBase } from './site.mjs';
 const out = process.argv[2] ?? 'out';
-const base = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/$/, '');
+const base = resolveBase([], process.env);
 const src = readFileSync('src/lib/registry.ts', 'utf8') + readFileSync('src/lib/assessments.ts', 'utf8');
 const ids = [...new Set([...src.matchAll(/\bid: '([a-z0-9-]+)'/g), ...src.matchAll(/\['([a-z]+-drills)'/g)].map((m) => m[1]))];
 const routes = ['', 'assessment', 'stats', 'review', 'session', 'daily', ...ids.map((id) => `play/${id}`)];

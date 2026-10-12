@@ -6,7 +6,7 @@ Floorwork is a static website: everything runs in the visitor's browser. There a
 
 > Floorwork is an independent practice platform. It is **not affiliated with, endorsed by or connected to TraderMath, any trading firm or any financial institution.** Where an activity follows a publicly described test format, the firm is named only to describe that format; every question, game and line of code is original. Nothing here is financial advice.
 
-**Live site:** `https://USERNAME.github.io/floorwork/` (replace with your link after deploying)
+**Live site:** https://dayaveer1.github.io/market-math/ (available once the first deployment succeeds) · **Repository:** https://github.com/dayaveer1/market-math
 
 <!-- Screenshots: run the site (npm run dev), then `npm run screenshots` to create these files, and remove this comment.
 ![Library](docs/screenshots/library-desktop.png)
@@ -29,52 +29,34 @@ _Screenshots: run `npm run screenshots` against a running site to generate `docs
 
 Also included: Easy, Medium, Hard and Custom difficulty on every activity; Standard, Practice (untimed) and Interview modes; difficulty that adapts during a session; an interview battery with section scores and an overall score; personal bests and progress charts; mistake review; custom multi-drill sessions; a daily challenge (based on the visitor's own date); shareable settings links; light and dark themes; keyboard and touch controls.
 
-## Put it online with GitHub Pages (free)
+## Deployment (GitHub Pages)
 
-You need a free GitHub account. No local install is required for this route.
+The site deploys automatically from `.github/workflows/deploy.yml` on every push to `main`.
 
-**1. Create the repository**
-- On github.com click **+ → New repository**.
-- Name it `floorwork`, which gives you the address `https://USERNAME.github.io/floorwork/`. Choose **Public**, leave "Add a README" unticked, then click **Create repository**.
+**How the workflow runs**
+1. **build** (no Pages access needed): installs dependencies, type-checks, runs unit tests, checks static-hosting compatibility, builds the static export under the base path `/market-math` (derived from the repository name), verifies all 57 pages exist, and uploads the site.
+2. **deploy**: confirms GitHub Pages is enabled with source "GitHub Actions" (failing with a plain explanation if not), then publishes the upload.
 
-**2. Upload the project**
+**One-time setup** (already done for this repository; repeat for a fork or a renamed copy)
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions.** Selecting it is enough; there is no Save button for this choice.
+2. **Actions** tab → **Deploy to GitHub Pages** → **Run workflow** (or re-run the latest run).
+3. When both jobs are green, the address is shown on the deploy job and under Settings → Pages.
 
-The easiest way is in the browser:
-- Unzip `floorwork.zip`, then open the inner `floorwork` folder (the one containing `package.json`).
-- On the new repository's page, click **uploading an existing file**.
-- Drag in **everything inside** that folder, including the `.github` folder. On Windows, turn on **View → Show → Hidden items** to see `.github` and `.gitignore`.
-- Click **Commit changes** (onto the `main` branch).
+**Updating the site:** commit to `main` (edit on github.com, upload files, or `git push`). Each push redeploys in a few minutes; the previous version stays live until a run succeeds.
 
-> If the browser upload skips the `.github` folder, create the workflow by hand: **Add file → Create new file**, name it `.github/workflows/deploy.yml`, paste in the contents of that file from the zip, and commit.
+### Troubleshooting
 
-Or use git from PowerShell (requires [Git for Windows](https://git-scm.com/download/win)):
+| Symptom | Cause and fix |
+|---|---|
+| `Get Pages site failed … Not Found` from `configure-pages` | The run started before Pages was enabled (typical for the very first commit). Enable Pages as above, then **Re-run all jobs**. Since this workflow version, the build no longer calls the Pages API at all, so this can only appear in the deploy job's "Check that GitHub Pages is enabled" step, with the fix in the message. |
+| "Pages source is not GitHub Actions" | Settings → Pages → Source is "Deploy from a branch". Switch it to **GitHub Actions** and re-run. |
+| `Resource not accessible by integration` | Something tried to create the Pages site with the built-in token, which isn't allowed. Enable Pages in Settings instead. |
+| Build job fails at Type-check / Unit tests / Build | A real code issue: open the red step, copy the log, and fix it (or report it). Nothing is deployed until it passes. |
+| Site loads without styles, or links go to `dayaveer1.github.io/play/…` | Wrong base path. It comes from the repository name; for a custom domain set the repository variable `PAGES_BASE_PATH` to `/`. |
 
-```powershell
-cd "$HOME\Downloads\floorwork\floorwork"
-git init -b main
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/USERNAME/floorwork.git
-git push -u origin main
-```
+**Optional: let the workflow enable Pages itself.** Create a fine-grained personal access token limited to this repository with **Pages: Read and write** and **Administration: Read and write**. Save it as the repository secret `PAGES_ENABLEMENT_TOKEN` (Settings → Secrets and variables → Actions). The deploy job then runs `actions/configure-pages` with `enablement: true` before deploying. Without the secret, that step is skipped. It isn't needed once Pages is enabled.
 
-**3. Turn on GitHub Pages**
-- In the repository, go to **Settings → Pages**.
-- Under **Build and deployment → Source**, choose **GitHub Actions**. Nothing else needs configuring.
-
-**4. Trigger the first deployment**
-- Open the **Actions** tab. If the upload's "Deploy to GitHub Pages" run started before Pages was enabled and failed, open it and click **Re-run all jobs**.
-- Otherwise click **Deploy to GitHub Pages → Run workflow → Run workflow**.
-- The run installs dependencies, type-checks, runs the unit tests, checks static compatibility, builds and deploys. It takes about 3–5 minutes.
-
-**5. Open the site**
-- When the run shows a green tick, the address appears on the **deploy** job and under **Settings → Pages**: `https://USERNAME.github.io/floorwork/`. Share that link; visitors need nothing installed.
-
-**6. Update the site later**
-- Edit or upload changed files on github.com (or `git add . ; git commit -m "…" ; git push`). Every push to `main` rebuilds and redeploys automatically.
-- If a run fails, open it in **Actions**, expand the red step and read the error. Copy it into an issue or your notes so it can be fixed. The previous version stays live until a run succeeds.
-
-The workflow works out the base path from the repository name. If you rename the repository, the site moves to the new name automatically. A repository named `USERNAME.github.io` is served at the root.
+**Forks and copies:** change `site.config.json` (used by local preview and tests). The workflow itself needs no edits, because it reads the repository name.
 
 ## Run it on your own computer (optional)
 
@@ -83,10 +65,10 @@ Requires Node.js 20 LTS (18.18+). In PowerShell, inside the folder containing `p
 ```powershell
 npm install            # once
 npm run dev            # development server → http://localhost:3000
-npm run preview        # production static build served like GitHub Pages → http://localhost:4173/floorwork/
+npm run preview        # production static build served like GitHub Pages → http://localhost:4173/market-math/
 ```
 
-If PowerShell says "running scripts is disabled", use `npm.cmd` instead of `npm`, use Command Prompt, or run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once. If Windows' "Extract All" made `floorwork\floorwork`, use the inner folder.
+If PowerShell says "running scripts is disabled", use `npm.cmd` instead of `npm`, use Command Prompt, or run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once. If Windows' "Extract All" made a nested folder, use the inner one that contains `package.json`.
 
 ## Tests
 
@@ -97,7 +79,7 @@ npm run check:static     # static-hosting compatibility of the source
 npm run build            # static export to out/ (then verifies every route exists)
 npx playwright install chromium     # once
 npm run test:e2e         # browser tests against the dev server (desktop + mobile)
-npm run test:static      # browser tests against the static export under /floorwork/
+npm run test:static      # browser tests against the static export under /market-math/
 npm run test:all         # typecheck → unit → build → static browser tests
 ```
 

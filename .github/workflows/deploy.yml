@@ -1,18 +1,20 @@
-# Builds Floorwork as a static site and publishes it to GitHub Pages on every push to main.
+# Builds the site as a static export and publishes it to GitHub Pages on every push to main.
+#
 # One-time setup: repository Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# The build job does not depend on Pages being enabled, so type-checking, tests and the build always run.
+# The deploy job checks Pages first and explains how to fix it if it is not enabled.
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
-  workflow_dispatch: # allows a manual run from the Actions tab
+  workflow_dispatch: # manual run from the Actions tab
 
+# Least privilege by default; each job widens only what it needs.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# One deployment at a time; let an in-progress deployment finish.
+# One deployment at a time; never cancel a deployment that is in progress.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -20,18 +22,34 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      base_path: ${{ steps.base.outputs.base_path }}
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Configure GitHub Pages
-        id: pages
-        uses: actions/configure-pages@v5
+      - name: Work out the site's base path
+        id: base
+        # Project site  https://OWNER.github.io/REPO/  → "/REPO" (here "/market-math").
+        # User site     https://OWNER.github.io/       → "" (repository named OWNER.github.io).
+        # Custom domain: set the repository variable PAGES_BASE_PATH to "/" (Settings → Secrets and variables → Actions → Variables).
+        env:
+          OVERRIDE: ${{ vars.PAGES_BASE_PATH }}
+        run: |
+          REPO="${GITHUB_REPOSITORY#*/}"
+          if [ -n "$OVERRIDE" ]; then BASE="$OVERRIDE"
+          elif [[ "${REPO,,}" == *.github.io ]]; then BASE=""
+          else BASE="/$REPO"; fi
+          [ "$BASE" = "/" ] && BASE=""
+          echo "base_path=$BASE" >> "$GITHUB_OUTPUT"
+          echo "Site will be served under: https://${GITHUB_REPOSITORY_OWNER,,}.github.io${BASE}/"
 
       - name: Install dependencies
         run: |
@@ -46,24 +64,53 @@ jobs:
       - name: Static export check
         run: npm run check:static
 
-      - name: Build static site
-        # base_path is "/<repo-name>" for project sites and "" for a USERNAME.github.io repository.
+      - name: Build static site (includes export verification)
         env:
-          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.base.outputs.base_path }}
         run: node scripts/build-static.mjs
 
       - name: Upload site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: out
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write     # deploy to Pages
+      id-token: write  # OIDC token required by deploy-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      # Job-level so the optional step's `if:` can read it (a step cannot read its own env in `if:`).
+      HAS_ENABLEMENT_TOKEN: ${{ secrets.PAGES_ENABLEMENT_TOKEN != '' }}
     steps:
+      - name: Enable Pages automatically (only if a PAGES_ENABLEMENT_TOKEN secret exists)
+        # The built-in GITHUB_TOKEN cannot create a Pages site ("Resource not accessible by integration"),
+        # so this optional step needs a personal access token with Pages write / repo administration rights.
+        if: ${{ env.HAS_ENABLEMENT_TOKEN == 'true' }}
+        uses: actions/configure-pages@v6
+        with:
+          enablement: true
+          token: ${{ secrets.PAGES_ENABLEMENT_TOKEN }}
+
+      - name: Check that GitHub Pages is enabled
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! err=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --silent 2>&1); then
+            echo "::error title=GitHub Pages is not enabled for this repository::Open Settings → Pages, set 'Build and deployment → Source' to 'GitHub Actions', then re-run this workflow (Actions → this run → Re-run all jobs). API response: ${err}"
+            exit 1
+          fi
+          build_type=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type // "unknown"')
+          echo "Pages site found: $(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.html_url') (build type: ${build_type})"
+          if [ "$build_type" != "workflow" ]; then
+            echo "::error title=Pages source is not GitHub Actions::Settings → Pages → Source is set to '${build_type}' (deploy from a branch). Change it to 'GitHub Actions' and re-run."
+            exit 1
+          fi
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

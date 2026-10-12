@@ -9,13 +9,16 @@ Update this file at the end of every session. Tick only what was actually run or
 | 11 Oct 2026 | Authoring 1 | Scaffold, 29 activities, shell, persistence, analytics, e2e specs, investigation harness. Sandbox-only verification. |
 | 11 Oct 2026 | Authoring 2 | +4 trading simulators, +17 timed assessments, +Bet Grid (51 total). Cube orientation, in-session adaptivity, unlimited sessions, interview battery. Fixed Enter skipping the between-sections screen. Sandbox verification: 90 unit, 459 SSR, 63 browser, 20 app-flow. Packaged. |
 | 11 Oct 2026 | Authoring 3 | Stability audit, no new features. Package integrity check (0 unresolved imports). New audit tests. Fixed: multiple correct MC options, daily-page hydration, placeholder setting, shortcuts during assessments. Windows README corrected (nested folder, execution policy). Verification from clean unzip: 168 unit, 459 SSR, 63 browser (51/51 activities), 21 app-flow. |
+| 12 Oct 2026 | Authoring 5 | First Actions run failed at configure-pages (Pages site not yet created). Workflow restructured: build independent of Pages API, deploy-job preflight with clear errors, optional PAT enablement, Node-24 action majors, Node 22, repo-specific base path `/market-math` via site.config.json. Awaiting the next GitHub run. |
 | 11 Oct 2026 | Authoring 4 | GitHub Pages: static export with base path, trailing slashes, 404 page, `.nojekyll`; static-compatibility checker; export verifier; Pages-like preview server; static e2e suite; deploy + e2e workflows; MIT licence; footer disclaimer; README deployment guide. Regression all green; real build/deploy not yet run. |
 
 ## 0. First deployment (do this first)
 
-- [ ] Push to GitHub, set **Settings → Pages → Source: GitHub Actions**, run **Deploy to GitHub Pages**
+- [x] Pushed to github.com/dayaveer1/market-math (commit ac8f329); first run failed at configure-pages (Pages not yet enabled). See docs/VERIFICATION.md §1c
+- [ ] Commit the updated workflow and scripts, confirm Settings → Pages → Source: GitHub Actions, and get a green **build** job (install → type-check → tests → build → verify)
+- [ ] Green **deploy** job; site reachable at https://dayaveer1.github.io/market-math/
 - [ ] If any step fails, copy the failing step's log. Likely first-run fixes: real type errors, ESLint findings during `next build`, `verify-export` complaints
-- [ ] Open `https://USERNAME.github.io/floorwork/`: library loads, a game plays, refresh on `/play/dice/` works, progress survives a refresh
+- [ ] Open `https://dayaveer1.github.io/market-math/`: library loads, a game plays, refresh on `/play/dice/` works, progress survives a refresh
 - [ ] Run the **Browser tests (static export)** workflow (or `npm run test:static` locally) and record results in docs/VERIFICATION.md §3
 - [ ] Generate screenshots (`npm run dev`, then `npm run screenshots`), commit `docs/screenshots/`, un-comment the README images
 - [ ] Commit `package-lock.json` after the first `npm install`, so CI uses `npm ci` with exact versions
